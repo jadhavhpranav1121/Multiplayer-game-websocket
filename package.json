@@ -1,0 +1,26 @@
+{
+  "name": "Multiplayer-game-websocket",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jadhavhpranav1121/Multiplayer-game-websocket.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jadhavhpranav1121/Multiplayer-game-websocket/issues"
+  },
+  "homepage": "https://github.com/jadhavhpranav1121/Multiplayer-game-websocket#readme",
+  "dependencies": {
+    "express": "^4.18.1",
+    "nodemon": "^2.0.16",
+    "uuid": "^8.3.2",
+    "websocket": "^1.0.34"
+  }
+}
