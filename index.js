@@ -32,7 +32,8 @@ wsServer.on("request",request=>{
             games[gameId]={
                 "id":gameId,
                 "balls":9,
-                "clients":[]
+                "clients":[],
+                "cells":Array(9).fill('')
             }
             const payLoad={
                 "method":"create",
@@ -48,7 +49,6 @@ wsServer.on("request",request=>{
             const game=games[gameId];
 
             if(currentClientId==clientId && game.clients.length<1){
-                console.log("current Memberr");
                 return;
             }
             if(game.clients.length<2){
@@ -70,17 +70,26 @@ wsServer.on("request",request=>{
             
         }
         if(result.method=="play"){
-            const clientId=result.clientId;
-            const gameId=result.gameId;
-            const ballId=result.ballId;
-            const option=result.option;
-            let state=games[gameId].state;
-            if(!state){
-                state={};
+            if(games[result.gameId]["cells"][result.ballId-1]==''){
+                const clientId=result.clientId;
+                const gameId=result.gameId;
+                const ballId=result.ballId;
+                const option=result.option;
+                let state=games[gameId].state;
+                if(!state){
+                    state={};``
+                }
+                state[ballId]=option;
+                games[gameId].state=state;
+                games[result.gameId]["cells"][result.ballId-1]=option;
+                let payLoad={
+                    "method":"playReply",
+                    "game":games[gameId]
+                }
+                games[gameId].clients.forEach(c=>{
+                    clients[c.clientId].connection.send(JSON.stringify(payLoad));
+                }) 
             }
-            state[ballId]=option;
-            games[gameId].state=state;
-
         }
     })
 
