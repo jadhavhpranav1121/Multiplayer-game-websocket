@@ -150,7 +150,13 @@
                         let cells=game["cells"];
                         for(let i=0;i<conditions.length;i++){
                             if(cells[conditions[i][0]]!=undefined && cells[conditions[i][1]]!=undefined && cells[conditions[i][2]]!=undefined &&  cells[conditions[i][0]]!='' && cells[conditions[i][1]]!='' && cells[conditions[i][2]]!='' && cells[conditions[i][0]]==cells[conditions[i][1]] && cells[conditions[i][1]]==cells[conditions[i][2]]){
-                                result.textContent=`${cells[conditions[i][0]]} is Winner`;
+                                result.textContent=`${game["option"]} is Winner`;
+                                const payLoad={
+                                    "method":"winner",
+                                    "clientId":clientId,
+                                    "gameId":gameId
+                                }
+                                ws.send(JSON.stringify(payLoad));
                                 break;
                             }
                         }
@@ -165,6 +171,9 @@
                     })
                     divBoard.appendChild(b);
                 }
+            }
+            if(response.method=='winner'){  
+                result.textContent=(response.winner+" is Winner");
             }
             if(response.method=='playReply'){
                 game=response.game;

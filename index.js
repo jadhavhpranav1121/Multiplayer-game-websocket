@@ -69,6 +69,22 @@ wsServer.on("request",request=>{
             }
             
         }
+        if(result.method=='winner'){
+            const game=games[result.gameId];
+            let ans='';
+            game.clients.forEach(e=>{
+                if(e.clientId==result.clientId){
+                    ans=e.nickname;
+                }
+            })
+            const payLoad={
+                "method":'winner',
+                "winner":ans
+            }
+            game.clients.forEach(c=>{
+                clients[c.clientId].connection.send(JSON.stringify(payLoad));
+            }) 
+        }
         if(result.method=="play"){
             if(games[result.gameId]["cells"][result.ballId-1]==''){
                 const clientId=result.clientId;
