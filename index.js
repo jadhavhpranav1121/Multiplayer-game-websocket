@@ -1,5 +1,4 @@
 const v4=require("uuid").v4;
-const res = require("express/lib/response");
 const http=require('http');
 const app=require("express")();
 app.listen("8000",()=>{
@@ -15,6 +14,7 @@ httpServer.listen(4200,()=>{
 
 const clients={};
 const games={};
+let currentClientId=0;
 const wsServer=new websocketServer({
     "httpServer": httpServer
 })
@@ -25,19 +25,20 @@ wsServer.on("request",request=>{
     connection.on("close",()=> console.log("Closed"));
     connection.on("message",message=>{
         const result=JSON.parse(message.utf8Data);
-        console.log(result);
         if(result.method==="create"){
             const clientId=result.clientId;
+            currentClientId=clientId;
             const gameId=v4();
             games[gameId]={
                 "id":gameId,
-                "balls":20,
+                "balls":9,
                 "clients":[]
             }
             const payLoad={
                 "method":"create",
                 "game":games[gameId]
             }
+            clients[clientId].nickname=result.nickname;
             const con=clients[clientId].connection;
             con.send(JSON.stringify(payLoad)); 
         }
@@ -45,14 +46,19 @@ wsServer.on("request",request=>{
             const clientId=result.clientId;
             const gameId=result.gameId;
             const game=games[gameId];
-            console.log("connectd")
-            if(game.clients.length<3){
-                const color={"0":"Red","1":"green","2":"Blue"}[game.clients.length];
+
+            if(currentClientId==clientId && game.clients.length<1){
+                console.log("current Memberr");
+                return;
+            }
+            if(game.clients.length<2){
+                const color={"0":"Red","1":"green"}[game.clients.length];
                 game.clients.push({
                     'clientId':clientId,
-                    "color":color
+                    "color":color,
+                    "nickname":result.nickname
                 })
-                if(game.clients.length===3) updateGameState();
+                if(game.clients.length===2) updateGameState();
                 let payLoad={
                     "method":"join",
                     "game":game

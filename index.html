@@ -4,6 +4,43 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+
+    #divBoard {
+        display:grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows:repate(3,1fr);
+        width: 250px;
+    }
+
+    .row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn {
+        border: 1px solid black;
+        border-radius: 5px;
+        height: 75px;
+        margin: 2px;
+        width: 75px;
+        text-align: center;
+        font-size: 50px;
+        font-weight: 500;
+    }
+
+    .btn:hover {
+        cursor: pointer;
+        background-color: rgb(240, 240, 240);
+    }
+
+    .btn:disabled {
+        color: black;
+        cursor: no-drop;
+    }
+
+    </style>
     <title>Multiplayer Cell Game</title>
 </head>
 <body>
@@ -11,25 +48,40 @@
     <button id="btnCreate">New Game</button>
     <button id="btnJoin">Join Game</button>
     <input type="text" id="txtGameId">
+    <button id="btnNickName">Enter Your Nickname</button>
+    <input type="text" id="txtNickName">
     <p id="id"></p>
     <div id="divPlayers"></div>
     <div id="divBoard"></div>
+    <p class="result">Player X Turn</p>
+
+    <div class="reset">
+        <button id="reset">Reset</button>
+    </div>
     <script>
         let clientId=null;
         let gameId=null;
         let playerColor=null;
         let ws=new WebSocket("ws://localhost:4200");
+        
         const btnCreate=document.getElementById("btnCreate");
         const btnJoin=document.getElementById("btnJoin");
         const txtGameId=document.getElementById("txtGameId");
         const divPlayers=document.getElementById("divPlayers");
         const divBoard=document.getElementById("divBoard");
         const id=document.getElementById("id");
-        btnCreate.addEventListener("click",e=>{
+        const btnNickName=document.getElementById("btnNickName");
+        const txtNickName=document.getElementById("txtNickName");
 
+        btnCreate.addEventListener("click",e=>{
+            if(txtNickName.value===''){
+                alert("Please Enter your nickname");
+                return;
+            }
             const payLoad={
                 "method":"create",
-                "clientId":clientId
+                "clientId":clientId,
+                "nickname":txtNickName.value
             }
             ws.send(JSON.stringify(payLoad));
         })
@@ -37,10 +89,15 @@
             if(gameId===null){
                 gameId=txtGameId.value;
             }
+            if(txtNickName.value===''){
+                alert("Please Enter your nickname");
+                return;
+            }
             const payLoad={
                 "method":"join",
                 "clientId":clientId,
-                "gameId":gameId
+                "gameId":gameId,
+                "nickname":txtNickName.value
             }
             ws.send(JSON.stringify(payLoad));
         })
@@ -64,19 +121,18 @@
                     const d=document.createElement("div");
                     d.style.width="200px";
                     d.style.background=c.color;
-                    d.textContent=c.clientId;
+                    d.textContent=c.nickname;
                     divPlayers.appendChild(d);
                     if(c.clientId===clientId) playerColor=c.color;
                 })
                 while(divBoard.firstChild) divBoard.removeChild(divBoard.firstChild);
-                for(let i=0;i<game.balls;i++){
-                    const b=document.createElement("button");
-                    b.id="ball"+(i+1);
-                    b.tag=i+1;
-                    b.style.width="100px";
-                    b.style.height="200px";
+                for(let i=1;i<=game.balls;i++){
+                    const b=document.createElement("div");
+                    b.className="btn";
+                    b.id="ball"+(i);
+                    b.tag=i;
                     b.addEventListener("click",e=>{
-                        b.style.background=playerColor;
+                        ticTacToe(e, i);
                         const payLoad={
                             "method":"play",
                             "clientId":clientId,
@@ -90,7 +146,6 @@
                 }
             }
             if(response.method==="update"){
-                console.log(response);
                 if(!response.game.state){
                     return;
                 }
@@ -102,7 +157,60 @@
                 }
             }
         }
+        let cells = ['', '', '', '', '', '', '', '', ''];
+        let currentPlayer = 'X';
+        let result = document.querySelector('.result');
+        let btns = document.querySelectorAll('.btn');
+        let conditions = [
+             [0, 1, 2],
+             [3, 4, 5],
+              [6, 7, 8],
+            [0, 3, 6],
+             [1, 4, 7],
+             [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
+];
 
+const ticTacToe = (element, index) => {
+    element.value = currentPlayer;
+    element.disabled = true;
+    cells[index] = currentPlayer;
+    currentPlayer = currentPlayer == 'X' ? 'O' : 'X';
+    result.innerHTML = `Player ${currentPlayer} Turn`;
+
+    for (let i = 0; i < conditions.length; i++) {
+        let condition = conditions[i];
+        let a = cells[condition[0]];
+        let b = cells[condition[1]];
+        let c = cells[condition[2]];
+
+        if (a == '' || b == '' || c == '') {
+            continue;
+        }
+
+        if ((a == b) && (b == c)) {
+            result.innerHTML = `Player ${a} Won 🎉`;
+            btns.forEach((btn) => btn.disabled = true);
+        }
+    }
+};
+
+function reset() {
+    cells = ['', '', '', '', '', '', '', '', ''];
+    btns.forEach((btn) => {
+        btn.value = '';
+    });
+    currentPlayer = 'X';
+    result.innerHTML = `Player X Turn`;
+    btns.forEach((btn) => btn.disabled = false);
+};
+
+document.querySelector('#reset').addEventListener('click', reset);
+
+btns.forEach((btn, i) => {
+    btn.addEventListener('click', () => ticTacToe(btn, i));
+});
     </script>
 </body>
 </html>
