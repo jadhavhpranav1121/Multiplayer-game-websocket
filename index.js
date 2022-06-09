@@ -52,10 +52,10 @@ wsServer.on("request",request=>{
                 return;
             }
             if(game.clients.length<2){
-                const color={"0":"Red","1":"green"}[game.clients.length];
+                const option={"0":"X","1":"O"}[game.clients.length];
                 game.clients.push({
                     'clientId':clientId,
-                    "color":color,
+                    "option":option,
                     "nickname":result.nickname
                 })
                 if(game.clients.length===2) updateGameState();
@@ -73,12 +73,12 @@ wsServer.on("request",request=>{
             const clientId=result.clientId;
             const gameId=result.gameId;
             const ballId=result.ballId;
-            const color=result.color;
+            const option=result.option;
             let state=games[gameId].state;
             if(!state){
                 state={};
             }
-            state[ballId]=color;
+            state[ballId]=option;
             games[gameId].state=state;
 
         }

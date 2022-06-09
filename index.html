@@ -61,7 +61,7 @@
     <script>
         let clientId=null;
         let gameId=null;
-        let playerColor=null;
+        let playerOption=null;
         let ws=new WebSocket("ws://localhost:4200");
         
         const btnCreate=document.getElementById("btnCreate");
@@ -123,22 +123,23 @@
                     d.style.background=c.color;
                     d.textContent=c.nickname;
                     divPlayers.appendChild(d);
-                    if(c.clientId===clientId) playerColor=c.color;
+                    if(c.clientId===clientId) playerOption=c.option;
                 })
                 while(divBoard.firstChild) divBoard.removeChild(divBoard.firstChild);
-                for(let i=1;i<=game.balls;i++){
+                for(let i=0;i<game.balls;i++){
                     const b=document.createElement("div");
                     b.className="btn";
-                    b.id="ball"+(i);
-                    b.tag=i;
+                    b.id="ball"+(i+1);
+                    b.tag=i+1;
                     b.addEventListener("click",e=>{
-                        ticTacToe(e, i);
+                        // ticTacToe(e,i);
+                        b.textContent=playerOption;
                         const payLoad={
                             "method":"play",
                             "clientId":clientId,
                             "gameId":gameId,
                             "ballId":b.tag,
-                            "color":playerColor
+                            "option":playerOption
                         }
                         ws.send(JSON.stringify(payLoad));
                     })
@@ -152,7 +153,7 @@
                 for(const b of Object.keys(response.game.state)){
                     const color=response.game.state[b];
                     const ballObject=document.getElementById("ball"+b);
-                    ballObject.style.backgroundColor=color;
+                    ballObject.textContent=color;                   
                     console.log("working")
                 }
             }
@@ -162,55 +163,55 @@
         let result = document.querySelector('.result');
         let btns = document.querySelectorAll('.btn');
         let conditions = [
-             [0, 1, 2],
-             [3, 4, 5],
-              [6, 7, 8],
-            [0, 3, 6],
-             [1, 4, 7],
-             [2, 5, 8],
-            [0, 4, 8],
-            [2, 4, 6]
-];
+                [0, 1, 2],
+                [3, 4, 5],
+                [6, 7, 8],
+                [0, 3, 6],
+                [1, 4, 7],
+                [2, 5, 8],
+                [0, 4, 8],
+                [2, 4, 6]
+        ];
 
-const ticTacToe = (element, index) => {
-    element.value = currentPlayer;
-    element.disabled = true;
-    cells[index] = currentPlayer;
-    currentPlayer = currentPlayer == 'X' ? 'O' : 'X';
-    result.innerHTML = `Player ${currentPlayer} Turn`;
+// const ticTacToe = (element, index) => {
+//     element.value = currentPlayer;
+//     element.disabled = true;
+//     cells[index] = currentPlayer;
+//     currentPlayer = currentPlayer == 'X' ? 'O' : 'X';
+//     result.innerHTML = `Player ${currentPlayer} Turn`;
 
-    for (let i = 0; i < conditions.length; i++) {
-        let condition = conditions[i];
-        let a = cells[condition[0]];
-        let b = cells[condition[1]];
-        let c = cells[condition[2]];
+//     for (let i = 0; i < conditions.length; i++) {
+//         let condition = conditions[i];
+//         let a = cells[condition[0]];
+//         let b = cells[condition[1]];
+//         let c = cells[condition[2]];
 
-        if (a == '' || b == '' || c == '') {
-            continue;
-        }
+//         if (a == '' || b == '' || c == '') {
+//             continue;
+//         }
 
-        if ((a == b) && (b == c)) {
-            result.innerHTML = `Player ${a} Won 🎉`;
-            btns.forEach((btn) => btn.disabled = true);
-        }
-    }
-};
+//         if ((a == b) && (b == c)) {
+//             result.innerHTML = `Player ${a} Won 🎉`;
+//             btns.forEach((btn) => btn.disabled = true);
+//         }
+//     }
+// };
 
-function reset() {
-    cells = ['', '', '', '', '', '', '', '', ''];
-    btns.forEach((btn) => {
-        btn.value = '';
-    });
-    currentPlayer = 'X';
-    result.innerHTML = `Player X Turn`;
-    btns.forEach((btn) => btn.disabled = false);
-};
+// function reset() {
+//     cells = ['', '', '', '', '', '', '', '', ''];
+//     btns.forEach((btn) => {
+//         btn.value = '';
+//     });
+//     currentPlayer = 'X';
+//     result.innerHTML = `Player X Turn`;
+//     btns.forEach((btn) => btn.disabled = false);
+// };
 
-document.querySelector('#reset').addEventListener('click', reset);
+// document.querySelector('#reset').addEventListener('click', reset);
 
-btns.forEach((btn, i) => {
-    btn.addEventListener('click', () => ticTacToe(btn, i));
-});
+// btns.forEach((btn, i) => {
+//     btn.addEventListener('click', () => ticTacToe(btn, i));
+// });
     </script>
 </body>
 </html>
