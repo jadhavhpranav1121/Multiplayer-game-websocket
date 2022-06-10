@@ -1,8 +1,8 @@
 const v4=require("uuid").v4;
 const http=require('http');
 const app=require("express")();
-app.listen("8000",()=>{
-    console.log("listening to 8000");
+app.listen("9099",()=>{
+    console.log("listening to 9099");
 }); 
 
 app.get("/",(req,res)=>{ res.sendFile(__dirname+"/index.html")});
@@ -33,7 +33,8 @@ wsServer.on("request",request=>{
                 "id":gameId,
                 "balls":9,
                 "clients":[],
-                "cells":Array(9).fill('')
+                "cells":Array(9).fill(''),
+                "completed":false
             }
             const payLoad={
                 "method":"create",
@@ -44,30 +45,36 @@ wsServer.on("request",request=>{
             con.send(JSON.stringify(payLoad)); 
         }
         if(result.method==="join"){
+
             const clientId=result.clientId;
             const gameId=result.gameId;
             const game=games[gameId];
 
-            if(currentClientId==clientId && game.clients.length<1){
-                return;
-            }
-            if(game.clients.length<2){
-                const option={"0":"X","1":"O"}[game.clients.length];
-                game.clients.push({
-                    'clientId':clientId,
-                    "option":option,
-                    "nickname":result.nickname
-                })
-                if(game.clients.length===2) updateGameState();
-                let payLoad={
-                    "method":"join",
-                    "game":game
+            if(!games[gameId]["completed"]){
+                if(currentClientId==clientId && game.clients.length<1){
+                    return;
                 }
-                game.clients.forEach(c=>{
-                    clients[c.clientId].connection.send(JSON.stringify(payLoad));
-                }) 
+                if(game.clients.length<2){
+                    const option={"0":"X","1":"O"}[game.clients.length];
+                    game.clients.push({
+                        'clientId':clientId,
+                        "option":option,
+                        "nickname":result.nickname
+                    })
+                    if(game.clients.length===2) updateGameState();
+                    let payLoad={
+                        "method":"join",
+                        "game":game
+                    }
+                    game.clients.forEach(c=>{
+                        clients[c.clientId].connection.send(JSON.stringify(payLoad));
+                    }) 
+                }
             }
-            
+            else{
+                console.error("game is completed");
+            }  
+           
         }
         if(result.method=='winner'){
             const game=games[result.gameId];
@@ -79,7 +86,8 @@ wsServer.on("request",request=>{
             })
             const payLoad={
                 "method":'winner',
-                "winner":ans
+                "winner":ans,
+                "completed":game["completed"]
             }
             game.clients.forEach(c=>{
                 clients[c.clientId].connection.send(JSON.stringify(payLoad));
@@ -106,6 +114,9 @@ wsServer.on("request",request=>{
                     clients[c.clientId].connection.send(JSON.stringify(payLoad));
                 }) 
             }
+        }
+        if(result.method=='close'){
+            
         }
     })
 
