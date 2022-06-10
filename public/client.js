@@ -54,7 +54,7 @@ ws.onmessage=message=>{
 
     if(response.method=="create"){
         gameId=response.game.id;
-        id.textContent=gameId;
+        txtGameId.value=gameId;
         turnNumber=response.game.turn
     }
     if(response.method=="join"){
