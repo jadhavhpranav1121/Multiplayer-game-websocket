@@ -8,7 +8,23 @@
     <title>Multiplayer Tic Tac Toe Game</title>
 </head>
 <body>
+
+    <div class="area">
+        <ul class="circles">
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+        </ul>
+    </div>
    <div class="container">
+   
     <h1 class="title">Tic Tac Toe Game</h1>
     <div class="inputBox">
 
@@ -24,7 +40,7 @@
     </div>
    
     <br>
-    <label for="txtNickName" id="labelNickname">Enter Your Nickname</button>
+    <label for="txtNickName" id="labelNickname">Enter Your Nickname:-  </button>
     <input type="text" id="txtNickName">
     <p id="id"></p>
     <div class="row">
@@ -33,7 +49,6 @@
             <div id="divOptions"></div>
         </div>
         <div id="divBoard"></div>
-        <p id="result"></p>
     </div>
   
 
@@ -41,7 +56,11 @@
         <button id="reset">Reset</button>
     </div> -->
    </div>
-    
+   
+   <div class="winner">
+      <p id="result">Pranav is winner</p>
+      <button id="restart">Restart Game</button>
+   </div>
     <script src="client.js"></script>
 </body>
 </html>

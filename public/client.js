@@ -16,6 +16,9 @@ const btnNickName=document.getElementById("btnNickName");
 const txtNickName=document.getElementById("txtNickName");
 const divOptions=document.getElementById("divOptions");
 const result=document.getElementById("result");
+const restart=document.getElementById("restart");
+let container=document.getElementsByClassName('container')[0];
+let winner=document.getElementsByClassName('winner')[0];
 
 btnCreate.addEventListener("click",e=>{
     if(txtNickName.value===''){
@@ -28,7 +31,13 @@ btnCreate.addEventListener("click",e=>{
         "nickname":txtNickName.value
     }
     ws.send(JSON.stringify(payLoad));
+});
+
+restart.addEventListener("click",(e)=>{
+    container.style.display="block"; 
+    winner.style.display="none";
 })
+
 btnJoin.addEventListener("click",e=>{
     if(gameId===null){
         gameId=txtGameId.value;
@@ -130,6 +139,8 @@ ws.onmessage=message=>{
         for(let i=1;i<=9;i++){
             document.getElementById("ball"+i).style.pointerEvents='none';
         }
+        container.style.display="none"; 
+        winner.style.display="flex";
     }
     if(response.method=='playReply'){
         game=response.game;
