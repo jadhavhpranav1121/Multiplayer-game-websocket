@@ -6,6 +6,7 @@ let game=null;
 let completedOrNot=false;
 let turnNumber;
 let turn;
+let countOfClick=0;
 const btnCreate=document.getElementById("btnCreate");
 const btnJoin=document.getElementById("btnJoin");
 const txtGameId=document.getElementById("txtGameId");
@@ -88,46 +89,48 @@ ws.onmessage=message=>{
             b.id="ball"+(i+1);
             b.tag=i+1;
             b.addEventListener("click",e=>{
-                
-                if(game["cells"][b.tag-1]==''){
-                    b.textContent=playerOption;
-                    game["cells"][b.tag-1]=playerOption;
-                }
-                let conditions = [
-                                    [0, 1, 2],
-                                    [3, 4, 5],
-                                    [6, 7, 8],
-                                    [0, 3, 6],
-                                    [1, 4, 7],
-                                    [2, 5, 8],
-                                    [0, 4, 8],
-                                    [2, 4, 6]
-                ];
-                let cells=game["cells"];
-                if(completedOrNot==false){
-                    for(let i=0;i<conditions.length;i++){
-                        if( cells[conditions[i][0]]!=undefined && cells[conditions[i][1]]!=undefined && cells[conditions[i][2]]!=undefined &&  cells[conditions[i][0]]!='' && cells[conditions[i][1]]!='' && cells[conditions[i][2]]!='' && cells[conditions[i][0]]==cells[conditions[i][1]] && cells[conditions[i][1]]==cells[conditions[i][2]]){
-                            const payLoad={
-                                "method":"winner",
-                                "clientId":clientId,
-                                "gameId":gameId,
-                                "completed":true
+                if(turn[turnNumber].option==game.option){
+                    if(game["cells"][b.tag-1]==''){
+                        b.textContent=playerOption;
+                        game["cells"][b.tag-1]=playerOption;
+                    }
+                    let conditions = [
+                                        [0, 1, 2],
+                                        [3, 4, 5],
+                                        [6, 7, 8],
+                                        [0, 3, 6],
+                                        [1, 4, 7],
+                                        [2, 5, 8],
+                                        [0, 4, 8],
+                                        [2, 4, 6]
+                    ];
+                    let cells=game["cells"];
+                    if(completedOrNot==false){
+                        for(let i=0;i<conditions.length;i++){
+                            if( cells[conditions[i][0]]!=undefined && cells[conditions[i][1]]!=undefined && cells[conditions[i][2]]!=undefined &&  cells[conditions[i][0]]!='' && cells[conditions[i][1]]!='' && cells[conditions[i][2]]!='' && cells[conditions[i][0]]==cells[conditions[i][1]] && cells[conditions[i][1]]==cells[conditions[i][2]]){
+                                const payLoad={
+                                    "method":"winner",
+                                    "clientId":clientId,
+                                    "gameId":gameId,
+                                    "completed":true
+                                }
+                                ws.send(JSON.stringify(payLoad));
+                                break;
                             }
-                            ws.send(JSON.stringify(payLoad));
-                            break;
                         }
                     }
+                    const payLoad={
+                        "method":"play",
+                        "clientId":clientId,
+                        "gameId":gameId,
+                        "ballId":b.tag,
+                        "option":playerOption,
+                        "turnNumber":(turnNumber==0?1:0)
+                    }
+                    ws.send(JSON.stringify(payLoad));
                 }
-               
-                const payLoad={
-                    "method":"play",
-                    "clientId":clientId,
-                    "gameId":gameId,
-                    "ballId":b.tag,
-                    "option":playerOption,
-                    "turnNumber":(turnNumber==0?1:0)
-                }
-                ws.send(JSON.stringify(payLoad));
+              
+                
 
             })
             divBoard.appendChild(b);
