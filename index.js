@@ -3,8 +3,8 @@ const http=require('http');
 const express=require("express");
 const app=require("express")();
 
-app.listen("9099",()=>{
-    console.log("listening to 9099");
+app.listen("8000",()=>{
+    console.log("listening to 8000");
 }); 
 app.use(express.static(__dirname+'/public'));
 app.get("/",(req,res)=>{ res.sendFile(__dirname+"/public/index.html")});
@@ -65,10 +65,8 @@ wsServer.on("request",request=>{
                     game.clients.push({
                         'clientId':clientId,
                         "option":option,
-                        "nickname":result.nickname,
-                        "turnNumber":turnNumber
+                        "nickname":result.nickname
                     })
-                    turnNumber+=1;
                     if(game.clients.length===2) {
                         updateGameState();
                     }
@@ -109,7 +107,6 @@ wsServer.on("request",request=>{
                 const gameId=result.gameId;
                 const ballId=result.ballId;
                 const option=result.option;
-                turnNumber=result.turnNumber;
                 let state=games[gameId].state;
                 if(!state){
                     state={};
