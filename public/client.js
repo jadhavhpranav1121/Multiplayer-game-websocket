@@ -154,11 +154,16 @@ ws.onmessage=message=>{
         game=response.game;
         winnerStack=game["winnerStack"];
         while(winnerStackDiv.firstChild) winnerStackDiv.removeChild(winnerStackDiv.firstChild);
-        // let winner_stats=getFrequency(winnerStack);
-        for(let i=0;i<winnerStack.length;i++){
+        let winner_stats=getFrequency(winnerStack);
+        let sortable = [];
+        for (var f in winner_stats) {
+            sortable.push([f, winner_stats[f]]);
+        }       
+        sortable.sort( function (a,b) { return b[1] - a[1]; } );
+        for(let i=0;i<sortable.length;i++){
             let b=document.createElement("div");
             b.className='winnerHistory';
-            b.textContent=`${i+1} match winner is ${winnerStack[i]["nickname"]}`;
+            b.textContent=`${sortable[i][0]} :- ${sortable[i][1]}`;
             winnerStackDiv.appendChild(b);
         }        
     }
@@ -179,3 +184,14 @@ ws.onmessage=message=>{
         }
     }
 }
+const getFrequency = (array) => {
+    const map = {};
+    array.forEach(item => {
+       if(map[item["nickname"]]){
+          map[item["nickname"]]++;
+       }else{
+          map[item["nickname"]] = 1;
+       }
+    });
+    return map;
+ };
