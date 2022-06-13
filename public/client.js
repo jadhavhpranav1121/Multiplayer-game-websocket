@@ -4,9 +4,7 @@ let playerOption=null;
 let ws=new WebSocket("ws://localhost:4200");
 let game=null;
 let completedOrNot=false;
-let turnNumber;
-let turn;
-let countOfClick=0;
+let prevArray=[];
 const btnCreate=document.getElementById("btnCreate");
 const btnJoin=document.getElementById("btnJoin");
 const txtGameId=document.getElementById("txtGameId");
@@ -65,7 +63,6 @@ ws.onmessage=message=>{
     if(response.method=="create"){
         gameId=response.game.id;
         txtGameId.value=gameId;
-        turnNumber=response.game.turn
     }
     if(response.method=="join"){
          game=response.game;
@@ -87,9 +84,10 @@ ws.onmessage=message=>{
             const b=document.createElement("div");
             b.className="btn";
             b.id="ball"+(i+1);
-            b.tag=i+1;
-            b.addEventListener("click",e=>{
-                if(turn[turnNumber].option==game.option){
+            b.tag=i+1; 
+            b.addEventListener("click",e=>{ 
+                let turnArray=game["prevArray"]
+                if(turnArray[turnArray.length-1]!=playerOption){
                     if(game["cells"][b.tag-1]==''){
                         b.textContent=playerOption;
                         game["cells"][b.tag-1]=playerOption;
@@ -124,14 +122,11 @@ ws.onmessage=message=>{
                         "clientId":clientId,
                         "gameId":gameId,
                         "ballId":b.tag,
-                        "option":playerOption,
-                        "turnNumber":(turnNumber==0?1:0)
+                        "option":playerOption
                     }
                     ws.send(JSON.stringify(payLoad));
                 }
-              
-                
-
+                   
             })
             divBoard.appendChild(b);
         }

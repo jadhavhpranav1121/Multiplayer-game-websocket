@@ -16,9 +16,7 @@ httpServer.listen(4200,()=>{
 
 const clients={};
 const games={};
-let turn={};
 let currentClientId=0;
-let turnNumber=0;
 
 const wsServer=new websocketServer({
     "httpServer": httpServer
@@ -41,7 +39,8 @@ wsServer.on("request",request=>{
                 "clients":[],
                 "cells":Array(9).fill(''),
                 "completed":false,
-                "turn":turnNumber
+                "option":'X',
+                "prevArray":[]
             }
             const payLoad={
                 "method":"create",
@@ -71,13 +70,11 @@ wsServer.on("request",request=>{
                     })
                     turnNumber+=1;
                     if(game.clients.length===2) {
-                        turn=[game.clients[0],game.clients[1]];
                         updateGameState();
                     }
                     let payLoad={
                         "method":"join",
-                        "game":game,
-                        "turn":turn
+                        "game":game
                     }
                     game.clients.forEach(c=>{
                         clients[c.clientId].connection.send(JSON.stringify(payLoad));
@@ -107,8 +104,6 @@ wsServer.on("request",request=>{
             }) 
         }
         if(result.method=="play"){
-            // console.log(result.turnNumber)
-            // && (turn[result.turnNumber].clientId!=currentClientId)
             if(games[result.gameId]["cells"][result.ballId-1]==''){
                 const clientId=result.clientId;
                 const gameId=result.gameId;
@@ -122,6 +117,7 @@ wsServer.on("request",request=>{
                 state[ballId]=option;
                 games[gameId].state=state;
                 games[result.gameId]["cells"][result.ballId-1]=option;
+                games[result.gameId]["prevArray"].push(result.option);
                 let payLoad={
                     "method":"playReply",
                     "game":games[gameId]
