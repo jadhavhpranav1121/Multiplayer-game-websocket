@@ -38,9 +38,9 @@ wsServer.on("request",request=>{
                 "balls":9,
                 "clients":[],
                 "cells":Array(9).fill(''),
+                "winnerStack":[],
                 "completed":false,
-                "option":'X',
-                "prevArray":[]
+                "prevOption":''
             }
             const payLoad={
                 "method":"create",
@@ -91,11 +91,14 @@ wsServer.on("request",request=>{
                 if(e.clientId==result.clientId){
                     ans=e.nickname;
                 }
-            })
+            });
+            games[result.gameId]["winnerStack"].push({"nickname":ans});
+            console.log(games[result.gameId]["winnerStack"]);
             const payLoad={
                 "method":'winner',
                 "winner":ans,
-                "completed":game["completed"]
+                "completed":game["completed"],
+                "game":games[result.gameId]
             }
             game.clients.forEach(c=>{
                 clients[c.clientId].connection.send(JSON.stringify(payLoad));
@@ -114,7 +117,7 @@ wsServer.on("request",request=>{
                 state[ballId]=option;
                 games[gameId].state=state;
                 games[result.gameId]["cells"][result.ballId-1]=option;
-                games[result.gameId]["prevArray"].push(result.option);
+                games[result.gameId]["prevOption"]=result.option;
                 let payLoad={
                     "method":"playReply",
                     "game":games[gameId]
@@ -124,8 +127,18 @@ wsServer.on("request",request=>{
                 }) 
             }
         }
-        if(result.method=='close'){
-            
+        if(result.method=='reset'){
+            games[result.gameId].cells=Array(9).fill('');
+            games[result.gameId].prevOption='';
+            games[result.gameId].completed=false;
+            games[result.gameId].state={};
+            let payLoad={
+                "method":"reset",
+                "game":games[result.gameId]
+            }
+            games[result.gameId].clients.forEach(c=>{
+                clients[c.clientId].connection.send(JSON.stringify(payLoad));
+            }) 
         }
     })
 

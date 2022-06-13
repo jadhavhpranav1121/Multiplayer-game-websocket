@@ -5,6 +5,7 @@ let ws=new WebSocket("ws://localhost:4200");
 let game=null;
 let completedOrNot=false;
 let prevArray=[];
+let winnerStack=[];
 const btnCreate=document.getElementById("btnCreate");
 const btnJoin=document.getElementById("btnJoin");
 const txtGameId=document.getElementById("txtGameId");
@@ -18,6 +19,7 @@ const result=document.getElementById("result");
 const restart=document.getElementById("restart");
 let container=document.getElementsByClassName('container')[0];
 let winner=document.getElementsByClassName('winner')[0];
+let winnerStackDiv=document.getElementById('winnerStack');
 
 btnCreate.addEventListener("click",e=>{
     if(txtNickName.value===''){
@@ -32,10 +34,7 @@ btnCreate.addEventListener("click",e=>{
     ws.send(JSON.stringify(payLoad));
 });
 
-restart.addEventListener("click",(e)=>{
-    container.style.display="block"; 
-    winner.style.display="none";
-})
+
 
 btnJoin.addEventListener("click",e=>{
     if(gameId===null){
@@ -65,7 +64,7 @@ ws.onmessage=message=>{
         txtGameId.value=gameId;
     }
     if(response.method=="join"){
-         game=response.game;
+        game=response.game;
         while(divPlayers.firstChild) divPlayers.removeChild(divPlayers.firstChild);
         while(divOptions.firstChild) divOptions.removeChild(divOptions.firstChild);
         game.clients.forEach(c=>{
@@ -86,8 +85,7 @@ ws.onmessage=message=>{
             b.id="ball"+(i+1);
             b.tag=i+1; 
             b.addEventListener("click",e=>{ 
-                let turnArray=game["prevArray"]
-                if(turnArray[turnArray.length-1]!=playerOption){
+                if(game["prevOption"]!=playerOption){
                     if(game["cells"][b.tag-1]==''){
                         b.textContent=playerOption;
                         game["cells"][b.tag-1]=playerOption;
@@ -130,6 +128,20 @@ ws.onmessage=message=>{
             })
             divBoard.appendChild(b);
         }
+        restart.addEventListener("click",(e)=>{
+            container.style.display="block"; 
+            winner.style.display="none";
+            for(let i=1;i<=9;i++){
+                document.getElementById("ball"+i).textContent='';
+                document.getElementById("ball"+i).style.pointerEvents='auto';
+            }
+            const payLoad={
+                "method":"reset",
+                "gameId":gameId
+            }
+            completedOrNot=false;
+            ws.send(JSON.stringify(payLoad));
+        })
     }
     if(response.method=='winner'){  
         result.textContent=(response.winner+" is Winner");
@@ -139,8 +151,21 @@ ws.onmessage=message=>{
         }
         container.style.display="none"; 
         winner.style.display="flex";
+        game=response.game;
+        winnerStack=game["winnerStack"];
+        while(winnerStackDiv.firstChild) winnerStackDiv.removeChild(winnerStackDiv.firstChild);
+        // let winner_stats=getFrequency(winnerStack);
+        for(let i=0;i<winnerStack.length;i++){
+            let b=document.createElement("div");
+            b.className='winnerHistory';
+            b.textContent=`${i+1} match winner is ${winnerStack[i]["nickname"]}`;
+            winnerStackDiv.appendChild(b);
+        }        
     }
     if(response.method=='playReply'){
+        game=response.game;
+    }
+    if(response.method=='reset'){
         game=response.game;
     }
     if(response.method==="update"){
