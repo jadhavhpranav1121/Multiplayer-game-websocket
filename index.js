@@ -6,13 +6,11 @@ let frontEnd=process.env.PORT || 8000;
 app.listen(frontEnd,()=>{
     console.log("listening to 8000");
 }); 
-app.use(express.static(__dirname+'/docs'));
-app.get("/",(req,res)=>{ res.sendFile(__dirname+"/docs/index.html")});
 const websocketServer=require("websocket").server;
 const httpServer=http.createServer();
 let backendEnd=process.env.PORT || 3000;
 httpServer.listen(backendEnd,()=>{
-    console.log("listening.. on 4200");
+    console.log("listening.. on 3000");
 })
 
 const clients={};
