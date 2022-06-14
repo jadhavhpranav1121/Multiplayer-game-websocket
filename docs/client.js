@@ -1,7 +1,7 @@
 let clientId=null;
 let gameId=null;
 let playerOption=null;
-let ws=new WebSocket("ws://https://multiplayer-tic-tac-toe-game.herokuapp.com/");
+let ws=new WebSocket("wss://multiplayer-tic-tac-toe-game.herokuapp.com/");
 let game=null;
 let completedOrNot=false;
 let prevArray=[];
