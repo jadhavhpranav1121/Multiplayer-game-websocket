@@ -6,8 +6,8 @@ const app=require("express")();
 app.listen("8000",()=>{
     console.log("listening to 8000");
 }); 
-app.use(express.static(__dirname+'/public'));
-app.get("/",(req,res)=>{ res.sendFile(__dirname+"/public/index.html")});
+app.use(express.static(__dirname+'/docs'));
+app.get("/",(req,res)=>{ res.sendFile(__dirname+"/docs/index.html")});
 const websocketServer=require("websocket").server;
 const httpServer=http.createServer();
 httpServer.listen(4200,()=>{
