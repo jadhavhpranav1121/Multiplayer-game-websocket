@@ -1,6 +1,5 @@
 const v4=require("uuid").v4;
 const http=require('http');
-const express=require("express");
 const app=require("express")();
 // let frontEnd=process.env.PORT || 8000;
 // app.listen(frontEnd,()=>{
@@ -9,7 +8,7 @@ const app=require("express")();
 const websocketServer=require("websocket").server;
 const httpServer=http.createServer();
 let backendEnd=process.env.PORT || 3000;
-httpServer.listen(backendEnd,()=>{
+websocketServer.listen(backendEnd,()=>{
     console.log("listening.. on 3000");
 })
 
