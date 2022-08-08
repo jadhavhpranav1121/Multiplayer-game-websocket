@@ -26,9 +26,9 @@ const wsServer=new websocketServer({
 
 // comment for production purpose
 
-app.listen(frontEnd,()=>{
-    console.log("listening to 2777");
-}); 
+// app.listen(frontEnd,()=>{
+//     console.log("listening to 2777");
+// }); 
 app.use(express.static(__dirname+'/docs/'));
 app.get("/",(req,res)=>{ res.sendFile(__dirname+"/docs/index.html")});
 
