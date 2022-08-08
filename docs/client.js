@@ -1,7 +1,12 @@
 let clientId=null;
 let gameId=null;
 let playerOption=null;
-let ws=new WebSocket("wss://multiplayer-tic-tac-toe-game.herokuapp.com/");
+// for production
+// let ws=new WebSocket("wss://multiplayer-tic-tac-toe-game.herokuapp.com/");
+// end
+//comment for production purposes
+let ws=new WebSocket("ws://localhost:3000");
+//end
 let game=null;
 let completedOrNot=false;
 let prevArray=[];
@@ -20,6 +25,7 @@ const restart=document.getElementById("restart");
 let container=document.getElementsByClassName('container')[0];
 let winner=document.getElementsByClassName('winner')[0];
 let winnerStackDiv=document.getElementById('winnerStack');
+let CreateOrNot=false;
 
 btnCreate.addEventListener("click",e=>{
     if(txtNickName.value===''){
@@ -44,13 +50,21 @@ btnJoin.addEventListener("click",e=>{
         alert("Please Enter your nickname");
         return;
     }
-    const payLoad={
-        "method":"join",
-        "clientId":clientId,
-        "gameId":gameId,
-        "nickname":txtNickName.value
+    else if(txtGameId.value.length<=0){
+        console.log(game[gameId].clients);
+        alert("First Create game ");
+        return;
     }
-    ws.send(JSON.stringify(payLoad));
+    else{
+        const payLoad={
+            "method":"join",
+            "clientId":clientId,
+            "gameId":gameId,
+            "nickname":txtNickName.value
+        }
+        ws.send(JSON.stringify(payLoad));
+    }
+ 
 })
 
 ws.onmessage=message=>{
@@ -60,7 +74,7 @@ ws.onmessage=message=>{
     }
 
     if(response.method=="create"){
-        gameId=response.game.id;
+        gameId=response.game;
         txtGameId.value=gameId;
     }
     if(response.method=="join"){
@@ -84,7 +98,10 @@ ws.onmessage=message=>{
             b.className="btn";
             b.id="ball"+(i+1);
             b.tag=i+1; 
+        
             b.addEventListener("click",e=>{ 
+                const emptyCount = game["cells"].filter(a => a.length === 0).length; 
+                console.log(game["cells"]);
                 if(game["prevOption"]!=playerOption){
                     if(game["cells"][b.tag-1]==''){
                         b.textContent=playerOption;
@@ -107,6 +124,7 @@ ws.onmessage=message=>{
                                 const payLoad={
                                     "method":"winner",
                                     "clientId":clientId,
+                                    "type":'winner',
                                     "gameId":gameId,
                                     "completed":true
                                 }
@@ -124,8 +142,19 @@ ws.onmessage=message=>{
                     }
                     ws.send(JSON.stringify(payLoad));
                 }
-                   
+                if(emptyCount==1){
+                    const payLoad={
+                        "method":"winner",
+                        "clientId":clientId,
+                        "type":'tie',
+                        "gameId":gameId,
+                        "completed":false
+                    }
+                    
+                    ws.send(JSON.stringify(payLoad));
+                }
             })
+         
             divBoard.appendChild(b);
         }
         restart.addEventListener("click",(e)=>{
@@ -144,7 +173,12 @@ ws.onmessage=message=>{
         })
     }
     if(response.method=='winner'){  
-        result.textContent=(response.winner+" is Winner");
+        if(response.type=='tie'){
+            result.textContent="game is tie";
+        }
+        else{
+            result.textContent=(response.winner+" is Winner");
+        }
         completedOrNot=true;
         for(let i=1;i<=9;i++){
             document.getElementById("ball"+i).style.pointerEvents='none';
@@ -166,6 +200,11 @@ ws.onmessage=message=>{
             b.textContent=`${sortable[i][0]} :- ${sortable[i][1]}`;
             winnerStackDiv.appendChild(b);
         }        
+    }
+    console.log(response.method);
+    if(response.method=='error'){
+        console.log(response);
+        alert(response.message);
     }
     if(response.method=='playReply'){
         game=response.game;

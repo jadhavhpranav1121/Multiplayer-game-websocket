@@ -1,16 +1,15 @@
 const v4=require("uuid").v4;
 const http=require('http');
 const app=require("express")();
-// let frontEnd=process.env.PORT || 8000;
-// app.listen(frontEnd,()=>{
-//     console.log("listening to 8000");
-// }); 
+const express=require("express");
+let frontEnd=process.env.PORT || 2777;
 const websocketServer=require("websocket").server;
 const httpServer=http.createServer();
 let backendEnd=process.env.PORT || 3000;
-websocketServer.listen(backendEnd,()=>{
-    console.log("listening.. on 3000");
-})
+// production Important
+// websocketServer.listen(backendEnd,()=>{
+//     console.log("listening.. on 3000");
+// })
 
 const clients={};
 const games={};
@@ -19,6 +18,29 @@ let currentClientId=0;
 const wsServer=new websocketServer({
     "httpServer": httpServer
 })
+
+
+
+
+
+
+// comment for production purpose
+
+app.listen(frontEnd,()=>{
+    console.log("listening to 2777");
+}); 
+app.use(express.static(__dirname+'/docs/'));
+app.get("/",(req,res)=>{ res.sendFile(__dirname+"/docs/index.html")});
+
+httpServer.listen(backendEnd,()=>{
+    console.log("listening.. on 3000");
+})
+
+// end
+
+
+
+
 
 wsServer.on("request",request=>{
     
@@ -49,12 +71,30 @@ wsServer.on("request",request=>{
             con.send(JSON.stringify(payLoad)); 
         }
         if(result.method==="join"){
-
+            
             const clientId=result.clientId;
             const gameId=result.gameId;
-            const game=games[gameId];
-
-            if(!games[gameId]["completed"]){
+            const game=games[gameId];   
+            if(!game){
+                console.log("game is died");
+                return;
+            }
+            if(result.nickname==clients[currentClientId].nickname){
+                console.log(result.nickname,clients[currentClientId].nickname)
+                const payLoad={
+                    "method":'error',
+                    "message":'users nickname should not be same',
+                    "type":"error"
+                }
+                console.log(game);
+                game.clients.forEach(c=>{
+                    console.log(clients[c.clientId]);
+                    clients[c.clientId].connection.send(JSON.stringify(payLoad));
+                }) 
+                return;
+            }
+          
+             if(!games[gameId]["completed"]){
                 if(currentClientId==clientId && game.clients.length<1){
                     return;
                 }
@@ -85,6 +125,19 @@ wsServer.on("request",request=>{
         if(result.method=='winner'){
             const game=games[result.gameId];
             let ans='';
+            if(result.type=="tie"){
+                const payLoad={
+                    "method":'winner',
+                    "winner":ans,
+                    "type":result.type,
+                    "completed":game["completed"],
+                    "game":games[result.gameId]
+                }
+                game.clients.forEach(c=>{
+                    clients[c.clientId].connection.send(JSON.stringify(payLoad));
+                }) 
+                return;
+            }
             game.clients.forEach(e=>{
                 if(e.clientId==result.clientId){
                     ans=e.nickname;
@@ -95,6 +148,7 @@ wsServer.on("request",request=>{
             const payLoad={
                 "method":'winner',
                 "winner":ans,
+                "type":result.type,
                 "completed":game["completed"],
                 "game":games[result.gameId]
             }
