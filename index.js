@@ -7,10 +7,11 @@ const websocketServer=require("websocket").server;
 const httpServer=http.createServer();
 let backendEnd=process.env.PORT || 3000;
 
-// production Important
-// websocketServer.listen(backendEnd,()=>{
-//     console.log("listening.. on 3000");
-// })
+// For Developement
+// comment for production purpose
+app.listen(frontEnd,()=>{
+    console.log("listening to 2777");
+}); 
 
 const clients={};
 const games={};
@@ -19,17 +20,10 @@ let currentClientId=0;
 const wsServer=new websocketServer({
     "httpServer": httpServer
 })
+// websocketServer.listen(backendEnd,()=>{
+//     console.log("listening.. on 3000");
+// })
 
-
-
-
-
-
-// comment for production purpose
-
-// app.listen(frontEnd,()=>{
-//     console.log("listening to 2777");
-// }); 
 app.use(express.static(__dirname+'/docs/'));
 app.get("/",(req,res)=>{ res.sendFile(__dirname+"/docs/index.html")});
 
@@ -77,7 +71,6 @@ wsServer.on("request",request=>{
             const gameId=result.gameId;
             const game=games[gameId]; 
             if(!game){
-                console.log("game is died");
                 return;
             }
 

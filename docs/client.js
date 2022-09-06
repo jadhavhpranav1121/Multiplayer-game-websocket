@@ -3,10 +3,11 @@ let gameId=null;
 let gameIdSecond=null;
 let playerOption=null;
 // // for production
-let ws=new WebSocket("wss://multiplayer-tic-tac-toe-game.herokuapp.com/");
+// let ws=new WebSocket("wss://multiplayer-tic-tac-toe-game.herokuapp.com/");
 // end
-//comment for production purposes
-// let ws=new WebSocket("ws://localhost:3000");
+
+// For Developement 
+let ws=new WebSocket("ws://localhost:3000");
 //end
 let game=null;
 let completedOrNot=false;
@@ -31,6 +32,8 @@ let container=document.getElementsByClassName('container')[0];
 let winner=document.getElementsByClassName('winner')[0];
 let winnerStackDiv=document.getElementById('winnerStack');
 let heading=document.getElementsByClassName('heading')[0];
+// let nextoption=document.getElementById("nextoption");
+let txtnextoption;
 let CreateOrNot=false;
 // let heading=document.getElementsByClassName("heading")[0];
 playShow.style.display="none";
@@ -44,7 +47,7 @@ btnCreate.addEventListener("click",e=>{
         return;
     }
     if(txtGameId.value!==''){
-        console.log(txtNickName.value);
+        // console.log(txtNickName.value);
         alert("Game is created already");
         return;
     } 
@@ -104,7 +107,7 @@ ws.onmessage=message=>{
     const response=JSON.parse(message.data);
     if(response.method=="connect"){
         clientId=response.clientId;
-        console.log(clientId);
+        // console.log(clientId);
     }
 
     if(response.method=="create"){
@@ -113,6 +116,7 @@ ws.onmessage=message=>{
     }
     if(response.method=="join"){
         game=response.game;
+        // console.log(game);
         while(divPlayers.firstChild) divPlayers.removeChild(divPlayers.firstChild);
         while(divOptions.firstChild) divOptions.removeChild(divOptions.firstChild);
         game.clients.forEach(c=>{
@@ -134,6 +138,7 @@ ws.onmessage=message=>{
             b.tag=i+1; 
         
             b.addEventListener("click",e=>{ 
+               
                 const emptyCount = game["cells"].filter(a => a.length === 0).length; 
                 if(game["prevOption"]!=playerOption){
                     if(game["cells"][b.tag-1]==''){
@@ -151,7 +156,7 @@ ws.onmessage=message=>{
                                         [2, 4, 6]
                     ];
                     let cells=game["cells"];
-                    console.log(completedOrNot);
+                    // console.log(completedOrNot);
                     if(completedOrNot==false){
                         for(let i=0;i<conditions.length;i++){
                             if( cells[conditions[i][0]]!=undefined && cells[conditions[i][1]]!=undefined && cells[conditions[i][2]]!=undefined &&  cells[conditions[i][0]]!='' && cells[conditions[i][1]]!='' && cells[conditions[i][2]]!='' && cells[conditions[i][0]]==cells[conditions[i][1]] && cells[conditions[i][1]]==cells[conditions[i][2]]){
@@ -175,6 +180,16 @@ ws.onmessage=message=>{
                         "option":playerOption
                     }
                     ws.send(JSON.stringify(payLoad));
+                }
+                else{
+                    txtnextoption=(game["prevOption"]=='X'?'O':'X');
+                    for(let i of game.clients){
+                        if(i.option==txtnextoption){
+                            alert("it's "+i.nickname+" turn");
+                            break;
+                        }
+                    }
+                   
                 }
                 if(emptyCount==1){
                     const payLoad={
@@ -260,7 +275,7 @@ ws.onmessage=message=>{
         winnerStackDiv.append(table);
     }
     if(response.method=='error'){
-        console.log(response);
+        // console.log(response);
         alert(response.message);
     }
     if(response.method=='playReply'){
@@ -268,7 +283,7 @@ ws.onmessage=message=>{
     }
     if(response.method=='reset'){
         game=response.game;
-        console.log(game);
+        // console.log(game);
         container.style.display="block"; 
         winner.style.display="none";
         // winnerStackDiv.style.display="block";
