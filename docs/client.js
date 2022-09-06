@@ -2,13 +2,21 @@ let clientId=null;
 let gameId=null;
 let gameIdSecond=null;
 let playerOption=null;
+
+
+
 // // for production
 let ws=new WebSocket("wss://multiplayer-tic-tac-toe-game.herokuapp.com/");
 // end
 
+
+
 // For Developement 
 // let ws=new WebSocket("ws://localhost:3000");
 //end
+
+
+
 let game=null;
 let completedOrNot=false;
 let prevArray=[];
