@@ -9,9 +9,9 @@ let backendEnd=process.env.PORT || 3000;
 
 // For Developement
 // comment for production purpose
-app.listen(frontEnd,()=>{
-    console.log("listening to 2777");
-}); 
+// app.listen(frontEnd,()=>{
+//     console.log("listening to 2777");
+// }); 
 
 const clients={};
 const games={};
