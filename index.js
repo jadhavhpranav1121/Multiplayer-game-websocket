@@ -6,10 +6,11 @@ let frontEnd=process.env.PORT || 2777;
 const websocketServer=require("websocket").server;
 const httpServer=http.createServer();
 let backendEnd=process.env.PORT || 3000;
+
 // production Important
-websocketServer.listen(backendEnd,()=>{
-    console.log("listening.. on 3000");
-})
+// websocketServer.listen(backendEnd,()=>{
+//     console.log("listening.. on 3000");
+// })
 
 const clients={};
 const games={};
