@@ -33,22 +33,32 @@
         </div>
       
         <div class="verticalInputBox">
-            <button id="btnJoin">Join Game</button><br>
-            <input type="text" id="txtGameId">
+            <button id="btnJoin" >Join Game</button><br>
+            <input type="text"  id="txtGameId">
         </div>
 
     </div>
    
     <br>
-    <label for="txtNickName" id="labelNickname">Enter Your Nickname:-  </button>
-    <input type="text" id="txtNickName">
+    <div class="displayButton">
+        <button id="winnerShow" onclick="showWinner()">Leaderboard</button>
+        <button id="playShow" onclick="showPlay()">Play game</button>
+    </div>
+   
+    <br>
+    <label for="txtNickName"  id="labelNickname">Enter Your Nickname:-  </button>
+    <input type="text" id="txtNickName" >
     <p id="id"></p>
-    <div class="row">
-        <div class="heading">
-            <div id="divPlayers"></div>
-            <div id="divOptions"></div>
-        </div>
+    <div class="row board">
+        <table class="heading">
+            <thead><th colspan="2">Player Name</th></thead>
+            <tr id="divPlayers"></div>
+            <tr id="divOptions"></div>
+        </table>
         <div id="divBoard"></div>
+    </div>
+    <div id="winnerStack">
+        
     </div>
   
 
@@ -56,9 +66,7 @@
         <button id="reset">Reset</button>
     </div> -->
 </div>
-<div id="winnerStack">
-        
-</div>
+
 
 
 <div class="winner">

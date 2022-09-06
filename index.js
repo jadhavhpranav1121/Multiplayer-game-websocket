@@ -26,9 +26,9 @@ const wsServer=new websocketServer({
 
 // comment for production purpose
 
-// app.listen(frontEnd,()=>{
-//     console.log("listening to 2777");
-// }); 
+app.listen(frontEnd,()=>{
+    console.log("listening to 2777");
+}); 
 app.use(express.static(__dirname+'/docs/'));
 app.get("/",(req,res)=>{ res.sendFile(__dirname+"/docs/index.html")});
 
@@ -74,30 +74,32 @@ wsServer.on("request",request=>{
             
             const clientId=result.clientId;
             const gameId=result.gameId;
-            const game=games[gameId];   
+            const game=games[gameId]; 
             if(!game){
                 console.log("game is died");
                 return;
             }
-            if(result.nickname==clients[currentClientId].nickname){
-                console.log(result.nickname,clients[currentClientId].nickname)
-                const payLoad={
-                    "method":'error',
-                    "message":'users nickname should not be same',
-                    "type":"error"
-                }
-                console.log(game);
-                game.clients.forEach(c=>{
-                    console.log(clients[c.clientId]);
-                    clients[c.clientId].connection.send(JSON.stringify(payLoad));
-                }) 
-                return;
-            }
+
+            // if(result.nickname==game[0].nickname && Object.keys(clients).length>1){
+            //     const payLoad={
+            //         "method":'error',
+            //         "message":'users nickname should not be same',
+            //         "type":"error"
+            //     }
+            //     console.log(game);
+            //     game.clients.forEach(c=>{
+            //         console.log(clients[c.clientId]);
+            //         clients[c.clientId].connection.send(JSON.stringify(payLoad));
+            //     }) 
+            //     return;
+            // }
           
-             if(!games[gameId]["completed"]){
-                if(currentClientId==clientId && game.clients.length<1){
-                    return;
-                }
+            if(!games[gameId]["completed"]){
+                // console.log( Object.keys(clients).length>=1)
+                // if(currentClientId==clientId && Object.keys(clients).length>1  && game.clients.length<1){
+                //     console.log("problem");
+                //     return;
+                // }
                 if(game.clients.length<2){
                     const option={"0":"X","1":"O"}[game.clients.length];
                     game.clients.push({
@@ -112,6 +114,7 @@ wsServer.on("request",request=>{
                         "method":"join",
                         "game":game
                     }
+                    // console.log(game);
                     game.clients.forEach(c=>{
                         clients[c.clientId].connection.send(JSON.stringify(payLoad));
                     }) 
@@ -120,7 +123,7 @@ wsServer.on("request",request=>{
             else{
                 console.error("game is completed");
             }  
-           
+           console.log(games[gameId]);
         }
         if(result.method=='winner'){
             const game=games[result.gameId];
@@ -186,11 +189,11 @@ wsServer.on("request",request=>{
             games[result.gameId].state={};
             let payLoad={
                 "method":"reset",
-                "game":games[result.gameId]
+                "game":games[result.gameId],
             }
             games[result.gameId].clients.forEach(c=>{
                 clients[c.clientId].connection.send(JSON.stringify(payLoad));
-            }) 
+            });
         }
     })
 
