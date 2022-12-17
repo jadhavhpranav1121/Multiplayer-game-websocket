@@ -6,7 +6,7 @@ let playerOption=null;
 
 
 // // for production
-let ws=new WebSocket("https://multiplayer-game-websocket.onrender.com");
+let ws=new WebSocket("wss://multiplayer-game-websocket.onrender.com");
 // end
 
 
