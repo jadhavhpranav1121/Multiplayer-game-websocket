@@ -5,7 +5,7 @@ const express=require("express");
 let frontEnd=process.env.PORT || 2777;
 const websocketServer=require("websocket").server;
 const httpServer=http.createServer();
-let backendEnd=process.env.PORT || 3000;
+let backendEnd=process.env.PORT;
 const wsServer=new websocketServer({
     "httpServer": httpServer
 })
