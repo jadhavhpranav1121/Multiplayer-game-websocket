@@ -27,10 +27,13 @@ let currentClientId=0;
 app.use(express.static(__dirname+'/docs/'));
 app.get("/",(req,res)=>{ res.sendFile(__dirname+"/docs/index.html")});
 
-httpServer.listen(backendEnd,()=>{
-    console.log(`listening.. on ${backendEnd}`);
-})
-
+// httpServer.listen(backendEnd,()=>{
+//     console.log(`listening.. on ${backendEnd}`);
+// })
+httpServer.listen(backendEnd, '0.0.0.0', err => {
+    if (err) throw err
+    console.log(`Listening on port ${backendEnd}`)
+ })
 // end
 
 
