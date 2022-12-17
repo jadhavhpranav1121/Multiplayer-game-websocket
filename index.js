@@ -28,7 +28,7 @@ app.use(express.static(__dirname+'/docs/'));
 app.get("/",(req,res)=>{ res.sendFile(__dirname+"/docs/index.html")});
 
 httpServer.listen(backendEnd,()=>{
-    console.log("listening.. on 3000");
+    console.log(`listening.. on ${backendEnd}`);
 })
 
 // end
